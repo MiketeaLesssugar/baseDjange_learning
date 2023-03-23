@@ -16,9 +16,24 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-import app
+from app import urls as app_urls
+
+# 导入 simplejwt 提供的几个验证视图类
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('index/', include(app.urls))
+    path('app/', include(app_urls)),
+    # DRF 提供的一系列身份认证的接口，用于在页面中认证身份，详情查阅DRF文档
+    path('api/auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # 获取Token的接口
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # 刷新Token有效期的接口
+    path('api/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # 验证Token的有效性
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]
